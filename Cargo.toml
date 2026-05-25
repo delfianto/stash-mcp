@@ -1,0 +1,24 @@
+[package]
+name = "stash-mcp"
+version = "0.1.0"
+edition = "2024"
+description = "MCP server for StashApp - single binary, reads a key=value env config file"
+license = "GPL-3.0-only"
+
+[[bin]]
+name = "stash-mcp"
+path = "src/main.rs"
+
+[dependencies]
+rmcp = { version = "1.7", features = ["server", "transport-io", "schemars"] }
+tokio = { version = "1", features = ["full"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }
+anyhow = "1"
+thiserror = "2"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "fmt"] }
+
+[dev-dependencies]
+tokio = { version = "1", features = ["full", "test-util"] }
