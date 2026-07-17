@@ -15,11 +15,7 @@ mod tests {
     use rmcp::model::{CallToolRequestParams, JsonObject};
     use serde_json::{Value, json};
 
-    use crate::{
-        config::Config,
-        mcp::tools,
-        stash::StashClient,
-    };
+    use crate::{config::Config, mcp::tools, stash::StashClient};
 
     // ── Test helpers ──────────────────────────────────────────────────────────
 
@@ -138,7 +134,10 @@ mod tests {
             .find_scenes(Value::Null)
             .await
             .expect("find_scenes failed");
-        assert!(!scenes.is_empty(), "expected at least one scene in the library");
+        assert!(
+            !scenes.is_empty(),
+            "expected at least one scene in the library"
+        );
         for s in &scenes {
             assert!(!s.id.is_empty(), "scene id must not be empty");
         }
@@ -188,8 +187,7 @@ mod tests {
             assert!(
                 has_performer,
                 "scene '{}' does not reference performer '{}'",
-                s.id,
-                performer.name
+                s.id, performer.name
             );
         }
     }
@@ -236,10 +234,7 @@ mod tests {
     #[tokio::test]
     async fn integration_find_tags_returns_list() {
         require_live!(_cfg, cli);
-        let tags = cli
-            .find_tags(Value::Null)
-            .await
-            .expect("find_tags failed");
+        let tags = cli.find_tags(Value::Null).await.expect("find_tags failed");
         assert!(!tags.is_empty(), "expected at least one tag in the library");
         for t in &tags {
             assert!(!t.id.is_empty(), "tag id must not be empty");
@@ -260,7 +255,10 @@ mod tests {
             .await
             .expect("find_tag_by_name failed")
             .expect("tag not found by name");
-        assert_eq!(found.id, first.id, "find_tag_by_name returned a different id");
+        assert_eq!(
+            found.id, first.id,
+            "find_tag_by_name returned a different id"
+        );
     }
 
     #[tokio::test]
@@ -295,9 +293,7 @@ mod tests {
     #[tokio::test]
     async fn integration_resolve_unknown_tag_returns_error() {
         require_live!(_cfg, cli);
-        let result = cli
-            .resolve_tag_ids(&["__NO_SUCH_TAG_ZZZZ__"])
-            .await;
+        let result = cli.resolve_tag_ids(&["__NO_SUCH_TAG_ZZZZ__"]).await;
         assert!(result.is_err(), "expected error for unknown tag name");
     }
 
@@ -497,10 +493,7 @@ mod tests {
             Some(names.len() as u64),
             "total_requested must match input length"
         );
-        assert!(
-            v["performers"].is_array(),
-            "must have performers array"
-        );
+        assert!(v["performers"].is_array(), "must have performers array");
     }
 
     #[tokio::test]

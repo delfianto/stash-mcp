@@ -2,10 +2,10 @@
 
 mod config;
 mod error;
-mod mcp;
-mod stash;
 #[cfg(test)]
 mod integration_tests;
+mod mcp;
+mod stash;
 
 use std::path::PathBuf;
 
