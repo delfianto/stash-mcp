@@ -1,7 +1,7 @@
 use rmcp::ErrorData as McpError;
 use rmcp::model::{
-    AnnotateAble, ListResourceTemplatesResult, ListResourcesResult, RawResource,
-    RawResourceTemplate, ReadResourceRequestParams, ReadResourceResult, ResourceContents,
+    ListResourceTemplatesResult, ListResourcesResult, ReadResourceRequestParams,
+    ReadResourceResult, Resource, ResourceContents, ResourceTemplate,
 };
 use serde_json::json;
 use tracing::instrument;
@@ -15,12 +15,7 @@ use crate::stash::{
 const MIME_JSON: &str = "application/json";
 
 fn text_resource_contents(uri: &str, text: String) -> ResourceContents {
-    ResourceContents::TextResourceContents {
-        uri: uri.to_owned(),
-        mime_type: Some(MIME_JSON.to_owned()),
-        text,
-        meta: None,
-    }
+    ResourceContents::text(text, uri).with_mime_type(MIME_JSON)
 }
 
 fn json_result(uri: &str, value: impl serde::Serialize) -> Result<ReadResourceResult, McpError> {
@@ -81,17 +76,9 @@ pub fn list_resources() -> ListResourcesResult {
     let resources = static_uris
         .iter()
         .map(|(uri, name, desc)| {
-            RawResource {
-                uri: (*uri).to_owned(),
-                name: (*name).to_owned(),
-                title: None,
-                description: Some((*desc).to_owned()),
-                mime_type: Some(MIME_JSON.to_owned()),
-                size: None,
-                icons: None,
-                meta: None,
-            }
-            .optional_annotate(None)
+            Resource::new(*uri, *name)
+                .with_description(*desc)
+                .with_mime_type(MIME_JSON)
         })
         .collect();
 
@@ -132,15 +119,9 @@ pub fn list_resource_templates() -> ListResourceTemplatesResult {
     let resource_templates = templates
         .iter()
         .map(|(tpl, name, desc)| {
-            RawResourceTemplate {
-                uri_template: (*tpl).to_owned(),
-                name: (*name).to_owned(),
-                title: None,
-                description: Some((*desc).to_owned()),
-                mime_type: Some(MIME_JSON.to_owned()),
-                icons: None,
-            }
-            .optional_annotate(None)
+            ResourceTemplate::new(*tpl, *name)
+                .with_description(*desc)
+                .with_mime_type(MIME_JSON)
         })
         .collect();
 

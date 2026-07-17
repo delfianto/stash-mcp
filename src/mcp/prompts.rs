@@ -1,7 +1,7 @@
 use rmcp::ErrorData as McpError;
 use rmcp::model::{
     GetPromptRequestParams, GetPromptResult, ListPromptsResult, Prompt, PromptArgument,
-    PromptMessage, PromptMessageRole,
+    PromptMessage, Role,
 };
 
 pub fn list_prompts() -> ListPromptsResult {
@@ -75,7 +75,7 @@ pub fn get_prompt(req: GetPromptRequestParams) -> Result<GetPromptResult, McpErr
     };
 
     let mut result = GetPromptResult::default();
-    result.messages = vec![PromptMessage::new_text(PromptMessageRole::User, text)];
+    result.messages = vec![PromptMessage::new_text(Role::User, text)];
     Ok(result)
 }
 
@@ -290,10 +290,12 @@ mod tests {
         let req = make_req("analyze-performer", Some(args));
         let result = get_prompt(req).unwrap();
         assert_eq!(result.messages.len(), 1);
-        let text = match &result.messages[0].content {
-            rmcp::model::PromptMessageContent::Text { text } => text.clone(),
-            _ => panic!("expected text"),
-        };
+        let text = result.messages[0]
+            .content
+            .as_text()
+            .expect("expected text")
+            .text
+            .clone();
         assert!(text.contains("Alice"));
         assert!(text.contains("get_performer_info"));
     }
@@ -317,10 +319,12 @@ mod tests {
         args.insert("preferences".to_owned(), "tall blonde performers".into());
         let req = make_req("recommend-scenes", Some(args));
         let result = get_prompt(req).unwrap();
-        let text = match &result.messages[0].content {
-            rmcp::model::PromptMessageContent::Text { text } => text.clone(),
-            _ => panic!("expected text"),
-        };
+        let text = result.messages[0]
+            .content
+            .as_text()
+            .expect("expected text")
+            .text
+            .clone();
         assert!(text.contains("tall blonde performers"));
     }
 
@@ -330,10 +334,12 @@ mod tests {
         args.insert("criteria".to_owned(), "tattooed Japanese women".into());
         let req = make_req("discover-performers", Some(args));
         let result = get_prompt(req).unwrap();
-        let text = match &result.messages[0].content {
-            rmcp::model::PromptMessageContent::Text { text } => text.clone(),
-            _ => panic!("expected text"),
-        };
+        let text = result.messages[0]
+            .content
+            .as_text()
+            .expect("expected text")
+            .text
+            .clone();
         assert!(text.contains("tattooed Japanese women"));
     }
 }

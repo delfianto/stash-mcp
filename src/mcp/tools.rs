@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use rmcp::ErrorData as McpError;
-use rmcp::model::{CallToolRequestParams, CallToolResult, Content, ListToolsResult, Tool};
+use rmcp::model::{CallToolRequestParams, CallToolResult, ContentBlock, ListToolsResult, Tool};
 use serde_json::{Value, json};
 use tracing::instrument;
 
@@ -224,13 +224,13 @@ fn arg_i64(args: &rmcp::model::JsonObject, key: &str) -> Option<i64> {
 
 fn ok_json(value: impl serde::Serialize) -> Result<CallToolResult, McpError> {
     match serde_json::to_string_pretty(&value) {
-        Ok(text) => Ok(CallToolResult::success(vec![Content::text(text)])),
+        Ok(text) => Ok(CallToolResult::success(vec![ContentBlock::text(text)])),
         Err(e) => Err(McpError::internal_error(e.to_string(), None)),
     }
 }
 
 fn err_text(msg: impl Into<String>) -> CallToolResult {
-    CallToolResult::error(vec![Content::text(msg.into())])
+    CallToolResult::error(vec![ContentBlock::text(msg.into())])
 }
 
 fn stash_err(e: crate::error::StashError) -> CallToolResult {

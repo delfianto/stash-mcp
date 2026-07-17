@@ -1,53 +1,27 @@
-# Held-back major dependency bumps
+# Major dependency upgrades — done
 
-Written after the 2026-07-17 dependency sweep. These are **not** currently broken on `main` —
-they're major-version bumps that `cargo upgrade` (compatible-only) correctly skipped, and that
-Renovate's `renovate/non-major-dependencies` PR (mislabeled — see below) currently fails CI on.
-Do not merge that PR as-is.
+Landed 2026-07-17. These were previously held back after a dependency sweep;
+they are now on current majors on `main`.
 
-## reqwest 0.12 → 0.13
+## Completed
 
-**Fails with:**
-```
-error: failed to select a version for `reqwest`.
-package `stash-mcp` depends on `reqwest` with feature `rustls-tls` but `reqwest` does not have that feature.
-```
+| Crate | From | To | Notes |
+| --- | --- | --- | --- |
+| `rmcp` | 1.8 | **2.2** | Model API aligned to MCP 2025-11-25; see migration discussion [#926](https://github.com/modelcontextprotocol/rust-sdk/discussions/926). Features: `server`, `transport-io` (`schemars` pulled in via `server`). |
+| `reqwest` | 0.12 | **0.13** | Feature rename `rustls-tls` → `rustls`. Still `default-features = false` + `json` + `rustls`. Crypto provider is aws-lc (reqwest 0.13 default). |
 
-reqwest 0.13 renamed its TLS feature flags. `rustls-tls` no longer exists; the replacements are:
+### rmcp app-side changes (for archaeology)
 
-| Old (0.12) | New (0.13) |
-| --- | --- |
-| `rustls-tls` | `rustls` (or `rustls-native-certs` / `rustls-no-provider` for finer control) |
+- `Content` → `ContentBlock`
+- `RawResource` / `RawResourceTemplate` + `AnnotateAble` → `Resource` / `ResourceTemplate` builders
+- `ResourceContents::text(...).with_mime_type(...)` for read payloads
+- `PromptMessageRole` → `Role`
 
-**Migration**: in `Cargo.toml`, change
-```toml
-reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }
-```
-to
-```toml
-reqwest = { version = "0.13", default-features = false, features = ["json", "rustls"] }
-```
-then `cargo build` and fix whatever else 0.13 changed (check the [reqwest 0.13
-changelog](https://github.com/seanmonstar/reqwest/releases) for anything beyond the feature
-rename — not fully audited here, only the compile-blocking issue was diagnosed).
+### reqwest
 
-## rmcp 1.8 → 2.2
+- No source changes required beyond `Cargo.toml` feature rename.
 
-Not diagnosed — no CI run has attempted this yet since Renovate's current PR only proposes
-reqwest. `rmcp` is the MCP SDK this server is built on; a major bump here is likely the bigger
-lift of the two. Check the [rmcp changelog/releases](https://github.com/modelcontextprotocol/rust-sdk)
-for breaking changes before attempting — this server's `mcp/` module will need a compile-and-fix
-pass at minimum.
+## Renovate
 
-## Recommended order
-
-1. rmcp 1.8 → 2.2 first (larger, more central to the codebase — better to do it deliberately
-   than as a side effect of a reqwest bump).
-2. reqwest 0.12 → 0.13 (small, mechanical, per above).
-
-## Until then
-
-Renovate will keep proposing `reqwest to 0.13` — it doesn't know this breaks, only that it's
-semver-valid. Either close each new PR as it appears, or add a `packageRules` entry to
-`renovate.json` disabling major-version PRs for this repo (matching the pattern already used in
-`the-bannered-mare`'s `renovate.json`) if you'd rather stop seeing them.
+Major updates remain disabled in `renovate.json` (`matchUpdateTypes: major` →
+`enabled: false`). Future majors should be deliberate, not auto-PRs.
