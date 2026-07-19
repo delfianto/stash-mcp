@@ -1,16 +1,13 @@
-bin := "stash-mcp"
-install_dir := env("HOME") / ".local/bin"
+bin     := "stash-mcp"
+bin_dir := env_var("HOME") / ".local/bin"
+sys_dir := "/usr/local/bin"
 
 # List available recipes
 default:
     @just --list
 
-# Build a debug binary
+# Build release binary
 build:
-    cargo build
-
-# Build an optimised release binary
-release:
     cargo build --release
 
 # Run all unit tests (no live Stash required)
@@ -25,32 +22,47 @@ test-integration:
 test-all:
     cargo test -- --nocapture
 
-# Check that the code compiles without producing a binary
-check:
-    cargo check
-
-# Run clippy lints
+# Lint — treat warnings as errors
 lint:
-    cargo clippy -- -D warnings
+    cargo clippy --all-targets --all-features -- -D warnings
+
+# Build, test, and lint in one shot
+check: build test lint
 
 # Compress the release binary with upx (skips if already packed)
-compress: release
-    upx -t target/release/{{ bin }} >/dev/null 2>&1 || upx --best --lzma target/release/{{ bin }}
+compress: build
+    upx -t target/release/{{bin}} >/dev/null 2>&1 || upx --best --lzma target/release/{{bin}}
 
-# Build release binary and copy it to ~/.local/bin
-install: compress
-    @mkdir -p "{{ install_dir }}"
-    cp target/release/{{ bin }} "{{ install_dir }}/{{ bin }}"
-    @echo "installed → {{ install_dir }}/{{ bin }}"
+# Install stash-mcp into ~/.local/bin (pass --system for /usr/local/bin via sudo)
+install *flags: compress
+    #!/usr/bin/env bash
+    set -euo pipefail
+    dir="{{bin_dir}}"
+    sudo=""
+    for f in {{flags}}; do
+        case "$f" in
+            --system) dir="{{sys_dir}}"; sudo="sudo" ;;
+            *) echo "install: unknown flag '$f' (only --system is supported)" >&2; exit 1 ;;
+        esac
+    done
+    $sudo install -Dm755 target/release/{{bin}} "$dir/{{bin}}"
+    echo "installed $dir/{{bin}}"
 
-# Remove the installed binary from ~/.local/bin
-uninstall:
-    rm -f "{{ install_dir }}/{{ bin }}"
-    @echo "removed {{ install_dir }}/{{ bin }}"
+# Remove installed binary (pass --system for /usr/local/bin via sudo)
+uninstall *flags:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    dir="{{bin_dir}}"
+    sudo=""
+    for f in {{flags}}; do
+        case "$f" in
+            --system) dir="{{sys_dir}}"; sudo="sudo" ;;
+            *) echo "uninstall: unknown flag '$f' (only --system is supported)" >&2; exit 1 ;;
+        esac
+    done
+    $sudo rm -f "$dir/{{bin}}"
+    echo "removed $dir/{{bin}}"
 
-# Build, test, then install
-ci: test release install
-
-# Remove build artefacts
+# Remove build artifacts
 clean:
     cargo clean
