@@ -33,8 +33,12 @@ check:
 lint:
     cargo clippy -- -D warnings
 
+# Compress the release binary with upx (skips if already packed)
+compress: release
+    upx -t target/release/{{ bin }} >/dev/null 2>&1 || upx --best --lzma target/release/{{ bin }}
+
 # Build release binary and copy it to ~/.local/bin
-install: release
+install: compress
     @mkdir -p "{{ install_dir }}"
     cp target/release/{{ bin }} "{{ install_dir }}/{{ bin }}"
     @echo "installed → {{ install_dir }}/{{ bin }}"
