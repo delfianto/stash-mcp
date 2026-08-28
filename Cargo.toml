@@ -2,6 +2,7 @@
 name = "stash-mcp"
 version = "0.1.0"
 edition = "2024"
+rust-version = "1.98.0"
 description = "MCP server for StashApp - single binary, reads a key=value env config file"
 license = "MIT"
 
@@ -12,7 +13,7 @@ path = "src/main.rs"
 [dependencies]
 anyhow = "1"
 reqwest = { version = "0.13", default-features = false, features = ["json", "rustls"] }
-rmcp = { version = "2.2", features = ["server", "transport-io"] }
+rmcp = { version = "3.1", features = ["server", "transport-io"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 thiserror = "2"

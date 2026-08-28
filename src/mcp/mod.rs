@@ -7,9 +7,9 @@ use std::sync::Arc;
 use rmcp::{
     ErrorData as McpError, RoleServer, ServerHandler,
     model::{
-        CallToolRequestParams, CallToolResult, GetPromptRequestParams, GetPromptResult,
+        CallToolRequestParams, CallToolResponse, GetPromptRequestParams, GetPromptResponse,
         Implementation, ListPromptsResult, ListResourceTemplatesResult, ListResourcesResult,
-        ListToolsResult, PaginatedRequestParams, ReadResourceRequestParams, ReadResourceResult,
+        ListToolsResult, PaginatedRequestParams, ReadResourceRequestParams, ReadResourceResponse,
         ServerCapabilities, ServerInfo,
     },
     service::RequestContext,
@@ -67,8 +67,10 @@ impl ServerHandler for StashMcpHandler {
         &self,
         request: CallToolRequestParams,
         _ctx: RequestContext<RoleServer>,
-    ) -> Result<CallToolResult, McpError> {
-        tools::call_tool(&self.client, &self.config, request).await
+    ) -> Result<CallToolResponse, McpError> {
+        tools::call_tool(&self.client, &self.config, request)
+            .await
+            .map(Into::into)
     }
 
     async fn list_resources(
@@ -91,8 +93,10 @@ impl ServerHandler for StashMcpHandler {
         &self,
         request: ReadResourceRequestParams,
         _ctx: RequestContext<RoleServer>,
-    ) -> Result<ReadResourceResult, McpError> {
-        resources::read_resource(&self.client, &self.config, request).await
+    ) -> Result<ReadResourceResponse, McpError> {
+        resources::read_resource(&self.client, &self.config, request)
+            .await
+            .map(Into::into)
     }
 
     async fn list_prompts(
@@ -107,8 +111,8 @@ impl ServerHandler for StashMcpHandler {
         &self,
         request: GetPromptRequestParams,
         _ctx: RequestContext<RoleServer>,
-    ) -> Result<GetPromptResult, McpError> {
-        prompts::get_prompt(request)
+    ) -> Result<GetPromptResponse, McpError> {
+        prompts::get_prompt(request).map(Into::into)
     }
 }
 
