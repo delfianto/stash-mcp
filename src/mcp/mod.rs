@@ -10,7 +10,7 @@ use rmcp::{
         CallToolRequestParams, CallToolResponse, GetPromptRequestParams, GetPromptResponse,
         Implementation, ListPromptsResult, ListResourceTemplatesResult, ListResourcesResult,
         ListToolsResult, PaginatedRequestParams, ReadResourceRequestParams, ReadResourceResponse,
-        ServerCapabilities, ServerInfo,
+        ServerCapabilities, ServerConfig,
     },
     service::RequestContext,
 };
@@ -32,13 +32,13 @@ impl StashMcpHandler {
 }
 
 impl ServerHandler for StashMcpHandler {
-    fn get_info(&self) -> ServerInfo {
+    fn get_info(&self) -> ServerConfig {
         let mut caps = ServerCapabilities::default();
         caps.tools = Some(Default::default());
         caps.resources = Some(Default::default());
         caps.prompts = Some(Default::default());
 
-        let mut info = ServerInfo::default();
+        let mut info = ServerConfig::default();
         info.protocol_version = rmcp::model::ProtocolVersion::LATEST;
         info.capabilities = caps;
         let mut impl_info = Implementation::default();
