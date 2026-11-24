@@ -1,6 +1,6 @@
 [package]
 name = "stash-mcp"
-version = "0.2.0"
+version = "0.2.1"
 edition = "2024"
 rust-version = "1.100.0"
 description = "MCP server for StashApp - single binary, reads a key=value env config file"
