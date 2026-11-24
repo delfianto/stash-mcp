@@ -22,3 +22,10 @@ target
 
 # Environment file
 .env
+
+# Local makepkg outputs
+/arch/pkg/
+/arch/src/
+/arch/*.pkg.tar.*
+/arch/*.tar.gz
+/arch/*.log

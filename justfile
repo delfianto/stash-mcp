@@ -50,7 +50,7 @@ links := ""
 # (e.g. llama.rs pulls live_* integration binaries).
 #   default:  test_unit := "cargo test"
 #   llama.rs: test_unit := "cargo test --lib --test cli --test api -- --test-threads=1"
-test_unit := "cargo test"
+test_unit := "cargo test -- --skip integration_tests::"
 
 # Integration / live suite (`just test --integration` / `--run-all`).
 # Empty = those flags error (most repos). Set only when a real suite exists:

@@ -12,7 +12,7 @@ A single-binary [Model Context Protocol](https://modelcontextprotocol.io) server
 
 The Python version works great. This version:
 
-- Ships as a **single static binary** — no interpreter, no virtualenv, no `pip install` archaeology
+- Ships as a **single executable** — no interpreter, no virtualenv, no `pip install` archaeology
 - Starts in milliseconds — your AI won't be waiting longer than your attention span
 - Uses ~5 MB of RAM at idle — leaving the other 64 GB for Stash itself
 - Panics loudly and informatively instead of silently returning `None`
@@ -128,7 +128,23 @@ FAVORITES_ONLY=true
 
 ## Installation
 
-### Prebuilt binary (recommended)
+### Arch Linux (x86_64)
+
+The package installs `stash-mcp`. Use `/usr/local/bin/stash-mcp` in your MCP client configuration. Executables are installed under `/usr/local/bin`.
+
+Download the `.pkg.tar.zst` from [GitHub Releases](https://github.com/delfianto/stash-mcp/releases/latest)
+and install it with `sudo pacman -U ./<package-file>`, or build the package
+from the checksum-verified release archive with `makepkg -si`:
+
+```sh
+git clone --branch v0.2.0 https://github.com/delfianto/stash-mcp.git
+cd stash-mcp/arch
+makepkg -si
+```
+
+### Build and install with `just`
+
+Source builds require Rust 1.100.0 or later.
 
 ```bash
 # clone and install to ~/.local/bin in one shot
@@ -152,8 +168,8 @@ cp target/release/stash-mcp ~/.local/bin/
 just build            # debug build
 just release          # optimised release build
 just test             # unit tests (no live Stash required)
-just test-integration # integration tests against a real Stash instance (requires .env)
-just test-all         # everything
+just test --integration # integration tests against a real Stash instance (requires .env)
+just test --run-all   # everything
 just lint             # clippy -D warnings
 just install          # release build → ~/.local/bin/stash-mcp
 just uninstall        # remove from ~/.local/bin
@@ -232,7 +248,7 @@ cp stash-mcp-python/.env.example .env   # or write your own
 # edit .env ...
 
 just test             # 100+ unit tests, no network required
-just test-integration # live tests — needs a real Stash in .env
+just test --integration # live tests — needs a real Stash in .env
 ```
 
 The integration tests skip themselves automatically when no `.env` is present, so `just test` is always safe to run in CI without credentials.
