@@ -1,18 +1,19 @@
-pkgbase = stash-mcp-bin
+pkgbase = stash-mcp
 	pkgdesc = Model Context Protocol server for Stash
 	pkgver = 0.2.1
-	pkgrel = 1
+	pkgrel = 2
 	url = https://github.com/delfianto/stash-mcp
 	arch = x86_64
 	license = MIT
 	depends = glibc
 	depends = libgcc
 	depends = ca-certificates
-	provides = stash-mcp=0.2.1
-	conflicts = stash-mcp
+	provides = stash-mcp-bin=0.2.1-2
+	conflicts = stash-mcp-bin
+	replaces = stash-mcp-bin
 	options = !strip
 	options = !debug
-	source = https://github.com/delfianto/stash-mcp/releases/download/v0.2.1/stash-mcp-v0.2.1-linux-x86_64.tar.gz
+	source = https://github.com/delfianto/stash-mcp/releases/download/arch-v0.2.1-2/stash-mcp-v0.2.1-linux-x86_64.tar.gz
 	sha256sums = 9cbf8f22f8f023793bc986623a3f226ce5d405ebab43740c65f90d2daa71457b
 
-pkgname = stash-mcp-bin
+pkgname = stash-mcp
